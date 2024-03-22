@@ -43,8 +43,18 @@ const ArticleForm = ({ editedArticle, onInputChange }) => {
       <Grid item xs={12}>
         <TextField
           name="tax"
+          type="number"
           label="Impuesto aplicable"
           value={editedArticle.tax}
+          onChange={onInputChange}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          name="quantity"
+          label="cantidad"
+          value={editedArticle.quantity}
           onChange={onInputChange}
           fullWidth
         />
@@ -60,6 +70,7 @@ ArticleForm.propTypes = {
     description: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     tax: PropTypes.number.isRequired,
+    quantity: PropTypes.number.isRequired,
   }).isRequired,
   onInputChange: PropTypes.func.isRequired,
 };

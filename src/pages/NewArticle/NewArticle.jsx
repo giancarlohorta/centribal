@@ -34,19 +34,20 @@ const NewArticlePage = () => {
     const { name, value } = event.target;
     setFormData({
       ...formData,
-      [name]: parseFunctions.parsedValue(value, name),
+      [name]: value,
     });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const { referencia } = formData;
+    const parsedData = parseFunctions.parsedValue(formData);
     if (existingReferences.includes(referencia)) {
       alert("Esta referencia ya está en uso. Por favor, elija otra.");
       return;
     }
     try {
-      await axios.post("http://localhost:3000/articles", formData);
+      await axios.post("http://localhost:3000/articles", parsedData);
       navigate("/articulos");
     } catch (error) {
       console.error("Erro ao criar um novo artigo:", error);

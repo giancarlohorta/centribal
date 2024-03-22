@@ -35,9 +35,9 @@ const ArticleDetails = () => {
   };
 
   const handleSaveButtonClick = async () => {
-    console.log(editedArticle);
+    const parsedData = parseFunctions.parsedValue(editedArticle);
     try {
-      await axios.put(`http://localhost:3000/articles/${id}`, editedArticle);
+      await axios.put(`http://localhost:3000/articles/${id}`, parsedData);
       setArticle(editedArticle);
       setIsEditing(false);
     } catch (error) {
@@ -54,7 +54,7 @@ const ArticleDetails = () => {
     const { name, value } = event.target;
     setEditedArticle({
       ...editedArticle,
-      [name]: parseFunctions.parsedValue(value, name),
+      [name]: value,
     });
   };
 
@@ -104,6 +104,9 @@ const ArticleDetails = () => {
             </Grid>
             <Grid item xs={12}>
               <Typography>Impuesto aplicable: {article.tax}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography>Cantidad: {article.quantity}</Typography>
             </Grid>
             <Grid item xs={12}>
               <Button
