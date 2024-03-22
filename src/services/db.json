@@ -1,0 +1,61 @@
+{
+  "articles": [
+    {
+      "id": "1",
+      "ref": "REF123",
+      "name": "Artículo 1a",
+      "description": "Descripción del artículo 1",
+      "price": 11,
+      "tax": "0.25"
+    },
+    {
+      "id": "2",
+      "ref": "REF456",
+      "name": "Artículo 2",
+      "description": "Descripción del artículo 2",
+      "price": 15.49,
+      "tax": 0.15
+    },
+    {
+      "id": "3cec",
+      "ref": "REF250",
+      "name": "Artigo 3",
+      "description": "vamos ver",
+      "price": 43.3,
+      "tax": 0.23
+    },
+    {
+      "id": "7319",
+      "ref": "REF371",
+      "name": "articulo 4",
+      "description": "vamos ver",
+      "price": 63.24,
+      "tax": 0.65
+    },
+    {
+      "id": "bdfd",
+      "ref": "REF001",
+      "name": "Name",
+      "description": "Jorge",
+      "price": 23.2,
+      "tax": 0.23
+    },
+    {
+      "id": "32cd",
+      "ref": "REF002",
+      "name": "name2",
+      "description": "jorge",
+      "price": 232,
+      "tax": 0.3
+    },
+    {
+      "id": "431c",
+      "ref": "REF003",
+      "name": "Name3",
+      "description": "jroge",
+      "price": 300,
+      "tax": 325
+    }
+  ],
+  "orders": []
+}
