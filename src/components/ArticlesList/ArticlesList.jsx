@@ -4,6 +4,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Button,
 } from "@mui/material"; // Importe os componentes do Material-UI necessários
 
 import PropTypes from "prop-types";
@@ -18,17 +19,26 @@ const ArticlesList = ({ list }) => {
           <TableCell>Referencia</TableCell>
           <TableCell>Nombre</TableCell>
           <TableCell>Precio sin impuestos</TableCell>
+          <TableCell>Acciones</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {list.map((article) => (
           <TableRow key={article.id}>
-            <TableCell>
-              <Link to={`/articulo/${article.id}`}>{article.ref}</Link>
-            </TableCell>
+            <TableCell>{article.ref}</TableCell>
             <TableCell>{article.name}</TableCell>
             <TableCell>
               {parseFunctions.formatedCurrency(article.price)}
+            </TableCell>
+            <TableCell>
+              <Button
+                component={Link}
+                to={`/articulo/${article.id}`}
+                variant="contained"
+                color="primary"
+              >
+                Ver Detalles
+              </Button>
             </TableCell>
           </TableRow>
         ))}

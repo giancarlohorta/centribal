@@ -15,6 +15,14 @@ const Home = () => {
       >
         Articulos
       </Button>
+      <Button
+        component={Link}
+        to="/pedidos"
+        variant="contained"
+        color="secondary"
+      >
+        Pedidos
+      </Button>
     </div>
   );
 };

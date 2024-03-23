@@ -11,6 +11,7 @@ const parsedValue = (data) => {
     ...data,
     price: parseFloat(data.price),
     tax: parseFloat(data.tax),
+    quantity: parseFloat(data.quantity),
   };
 };
 
