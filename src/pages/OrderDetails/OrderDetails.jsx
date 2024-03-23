@@ -13,6 +13,8 @@ const OrderDetailsPage = () => {
   const [availableArticles, setAvailableArticles] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
 
+  const orderChanged = JSON.stringify(order) !== JSON.stringify(initialOrder);
+
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
@@ -50,6 +52,43 @@ const OrderDetailsPage = () => {
       setAvailableArticles(available);
     }
   }, [order, articles]);
+
+  const calculateItemDifferences = (currentItems, initialItems) => {
+    const differences = [];
+
+    currentItems.forEach((currentItem) => {
+      const initialItem = initialItems.find(
+        (item) => item.id === currentItem.id
+      );
+
+      if (!initialItem) {
+        const currentArticle = articles.find(
+          (item) => item.id === currentItem.id
+        );
+        differences.push(currentArticle);
+      } else if (initialItem && initialItem.quantity !== currentItem.quantity) {
+        const currentArticle = articles.find(
+          (item) => item.id === currentItem.id
+        );
+        differences.push(currentArticle);
+      }
+    });
+
+    initialItems.forEach((initialItem) => {
+      const currentItem = currentItems.find(
+        (item) => item.id === initialItem.id
+      );
+
+      if (!currentItem) {
+        const currentArticle = articles.find(
+          (item) => item.id === initialItem.id
+        );
+        differences.push(currentArticle);
+      }
+    });
+
+    return differences;
+  };
 
   const handleAddArticle = (id, quantity) => {
     const articleToAdd = availableArticles.find((article) => article.id === id);
@@ -99,6 +138,50 @@ const OrderDetailsPage = () => {
     setArticles(updatedArticles);
   };
 
+  const handleRemoveArticle = (id, quantity) => {
+    const existingItemIndex = order.items.findIndex((item) => item.id === id);
+
+    if (existingItemIndex === -1) {
+      return;
+    }
+
+    const updatedItems = [...order.items];
+    updatedItems.splice(existingItemIndex, 1);
+
+    const updatedOrder = {
+      ...order,
+      items: updatedItems,
+    };
+
+    const totalWithoutTax = updatedOrder.items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+
+    const totalWithTax = updatedOrder.items.reduce(
+      (acc, item) => acc + item.price * (item.tax + 1) * item.quantity,
+      0
+    );
+
+    setOrder({
+      ...updatedOrder,
+      total: totalWithoutTax,
+      totalWithTax: totalWithTax,
+    });
+
+    const updatedArticles = articles.map((article) => {
+      if (article.id === id) {
+        return {
+          ...article,
+          quantity: article.quantity + quantity,
+        };
+      }
+      return article;
+    });
+
+    setArticles(updatedArticles);
+  };
+
   const handleEditButtonClick = () => {
     setIsEditing(!isEditing);
   };
@@ -106,6 +189,26 @@ const OrderDetailsPage = () => {
   const handleSaveChanges = async () => {
     try {
       await axios.put(`http://localhost:3000/orders/${orderId}`, order);
+
+      const diffArticles = calculateItemDifferences(
+        order.items,
+        initialOrder.items
+      );
+
+      await Promise.all(
+        diffArticles.map(async (item) => {
+          try {
+            await axios.put(`http://localhost:3000/articles/${item.id}`, {
+              ...item,
+              quantity: item.quantity,
+            });
+            setIsEditing(false);
+            setInitialOrder(order);
+          } catch (error) {
+            console.error("Error updating article:", error);
+          }
+        })
+      );
     } catch (error) {
       console.error("Error saving changes:", error);
     }
@@ -131,17 +234,12 @@ const OrderDetailsPage = () => {
         Total con Impuestos:
         {parseFunctions.formatedCurrency(order.totalWithTax)}
       </Typography>
-
       <Typography variant="h4">Productos en el Pedido</Typography>
-      <OrderList list={order.items} />
-
-      <Button variant="contained" onClick={handleEditButtonClick}>
-        Editar Pedido
-      </Button>
-      <Button component={Link} to="/pedidos" variant="contained">
-        Voltar para Pedidos
-      </Button>
-
+      <OrderList
+        list={order.items}
+        edit={isEditing}
+        onClick={handleRemoveArticle}
+      />
       {isEditing && (
         <>
           <Typography variant="h4">Agregar Nuevo Producto</Typography>
@@ -149,12 +247,18 @@ const OrderDetailsPage = () => {
           <OrderList
             list={availableArticles}
             onClick={handleAddArticle}
-            action
+            edit={isEditing}
+            addActions
           />
+        </>
+      )}
+      {isEditing ? (
+        <>
           <Button
             variant="contained"
             color="primary"
             onClick={handleSaveChanges}
+            disabled={!orderChanged}
           >
             Guardar Cambios
           </Button>
@@ -162,7 +266,15 @@ const OrderDetailsPage = () => {
             Cancelar
           </Button>
         </>
+      ) : (
+        <Button variant="contained" onClick={handleEditButtonClick}>
+          Editar Pedido
+        </Button>
       )}
+
+      <Button component={Link} to="/pedidos" variant="contained">
+        Voltar para Pedidos
+      </Button>
     </div>
   );
 };

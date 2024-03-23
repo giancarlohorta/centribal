@@ -8,7 +8,7 @@ import {
 import OrderItem from "../OrderItem";
 import PropTypes from "prop-types";
 
-const OrderList = ({ list, action, onClick }) => {
+const OrderList = ({ list, edit, onClick, addActions }) => {
   return (
     <Table>
       <TableHead>
@@ -18,7 +18,7 @@ const OrderList = ({ list, action, onClick }) => {
           <TableCell>Descripción</TableCell>
           <TableCell>Precio</TableCell>
           <TableCell>Cantidad</TableCell>
-          {action && <TableCell>Acción</TableCell>}
+          {edit && <TableCell>Acción</TableCell>}
         </TableRow>
       </TableHead>
       <TableBody>
@@ -27,7 +27,8 @@ const OrderList = ({ list, action, onClick }) => {
             item={item}
             key={item.id}
             onClick={onClick}
-            action={action}
+            edit={edit}
+            addActions={addActions}
           />
         ))}
       </TableBody>
@@ -46,8 +47,10 @@ OrderList.propTypes = {
       quantity: PropTypes.number.isRequired,
     })
   ).isRequired,
-  action: PropTypes.bool,
+  edit: PropTypes.bool,
   onClick: PropTypes.func,
+  addActions: PropTypes.bool,
+  limit: PropTypes.func,
 };
 
 export default OrderList;

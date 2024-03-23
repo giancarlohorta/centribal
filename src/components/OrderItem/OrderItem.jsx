@@ -3,8 +3,11 @@ import { Button, MenuItem, Select, TableCell, TableRow } from "@mui/material";
 import parseFunctions from "../../utils/format";
 import PropTypes from "prop-types";
 
-const OrderItem = ({ item, onClick, action }) => {
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
+const OrderItem = ({ item, onClick, edit, addActions }) => {
+  const [selectedQuantity, setSelectedQuantity] = useState(
+    addActions ? 1 : item.quantity
+  );
+  const limitQuantity = addActions ? item.quantity : item.quantity;
 
   return (
     <TableRow key={item.id}>
@@ -13,12 +16,12 @@ const OrderItem = ({ item, onClick, action }) => {
       <TableCell>{item.description}</TableCell>
       <TableCell>{parseFunctions.formatedCurrency(item.price)}</TableCell>
       <TableCell>
-        {action ? (
+        {edit && addActions ? (
           <Select
             value={selectedQuantity}
             onChange={(e) => setSelectedQuantity(e.target.value)}
           >
-            {[...Array(item.quantity)].map((_, index) => (
+            {[...Array(limitQuantity)].map((_, index) => (
               <MenuItem key={index + 1} value={index + 1}>
                 {index + 1}
               </MenuItem>
@@ -28,14 +31,14 @@ const OrderItem = ({ item, onClick, action }) => {
           item.quantity
         )}
       </TableCell>
-      {action && (
+      {edit && (
         <TableCell>
           <Button
             onClick={() => {
               onClick(item.id, selectedQuantity);
             }}
           >
-            Agregar
+            {addActions ? "Agregar" : "Borrar"}
           </Button>
         </TableCell>
       )}
@@ -53,7 +56,8 @@ OrderItem.propTypes = {
     quantity: PropTypes.number.isRequired,
   }).isRequired,
   onClick: PropTypes.func,
-  action: PropTypes.bool,
+  edit: PropTypes.bool,
+  addActions: PropTypes.bool,
 };
 
 export default OrderItem;
