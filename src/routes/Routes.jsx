@@ -9,6 +9,7 @@ const Orders = lazy(() => import("../pages/Orders"));
 const ArticleDetails = lazy(() => import("../pages/ArticleDetails"));
 const OrderDetails = lazy(() => import("../pages/OrderDetails"));
 const NewArticle = lazy(() => import("../pages/NewArticle"));
+const NewOrder = lazy(() => import("../pages/NewOrder"));
 // const NotFound = lazy(() => import("../pages/NotFound"));
 
 const Routes = () => (
@@ -58,6 +59,14 @@ const Routes = () => (
       element={
         <Suspense fallback={<Loading />}>
           <OrderDetails />
+        </Suspense>
+      }
+    />
+    <Route
+      path={ROUTES.newOrder}
+      element={
+        <Suspense fallback={<Loading />}>
+          <NewOrder />
         </Suspense>
       }
     />

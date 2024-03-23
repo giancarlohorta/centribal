@@ -5,4 +5,5 @@ export const ROUTES = {
   newArticle: "/nuevo-articulo",
   orders: "/pedidos",
   order: "/pedido/:id",
+  newOrder: "/nuevo-pedido",
 };

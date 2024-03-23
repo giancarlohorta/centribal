@@ -34,6 +34,14 @@ const OrdersPage = () => {
       <Button component={Link} to={"/"} variant="contained" color="primary">
         Volver
       </Button>
+      <Button
+        component={Link}
+        to={"/nuevo-pedido"}
+        variant="contained"
+        color="primary"
+      >
+        Crear nuevo pedido
+      </Button>
       <Table>
         <TableHead>
           <TableRow>
