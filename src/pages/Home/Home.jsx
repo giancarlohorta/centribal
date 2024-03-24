@@ -1,29 +1,41 @@
-import { Button, Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
-    <div>
-      <Typography variant="h3" color="primary">
-        Bem-vindo ao Material-UI com Vite!
-      </Typography>
-      <Button
-        component={Link}
-        to="/articulos"
-        variant="contained"
-        color="secondary"
+    <Grid container spacing={4}>
+      <Grid item xs={12}>
+        <Typography variant="h2" color="primary" textAlign="center">
+          Centribal
+        </Typography>
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        height="80vh"
       >
-        Articulos
-      </Button>
-      <Button
-        component={Link}
-        to="/pedidos"
-        variant="contained"
-        color="secondary"
-      >
-        Pedidos
-      </Button>
-    </div>
+        <Button
+          component={Link}
+          to="/articulos"
+          variant="contained"
+          color="secondary"
+          sx={{ marginRight: 2 }}
+        >
+          Articulos
+        </Button>
+        <Button
+          component={Link}
+          to="/pedidos"
+          variant="contained"
+          color="secondary"
+        >
+          Pedidos
+        </Button>
+      </Grid>
+    </Grid>
   );
 };
 

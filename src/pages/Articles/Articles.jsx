@@ -6,6 +6,18 @@ import { Link } from "react-router-dom";
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);
+
+  const handleDeleteArticle = async (articleId) => {
+    try {
+      await axios.delete(`http://localhost:3000/articles/${articleId}`);
+      const updatedArticles = articles.filter(
+        (article) => article.id !== articleId
+      );
+      setArticles(updatedArticles);
+    } catch (error) {
+      console.error("Error deleting article:", error);
+    }
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,7 +46,7 @@ const Articles = () => {
       <Button component={Link} to={"/"} variant="contained" color="primary">
         Volver
       </Button>
-      <ArticlesList list={articles} />
+      <ArticlesList list={articles} onDelete={handleDeleteArticle} />
     </div>
   );
 };

@@ -216,11 +216,16 @@ const CreateOrderPage = () => {
         {parseFunctions.formatedCurrency(order.totalWithTax)}
       </Typography>
       <OrderList list={order.items} edit onClick={handleRemoveArticle} />
-      <Button variant="contained" color="primary" onClick={handleCreateOrder}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleCreateOrder}
+        sx={{ marginRight: 2 }}
+      >
         Crear Pedido
       </Button>
       <Button component={Link} to="/pedidos" variant="contained">
-        Volver a Pedidos
+        Volver
       </Button>
     </div>
   );

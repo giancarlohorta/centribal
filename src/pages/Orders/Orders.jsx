@@ -15,6 +15,16 @@ import parseFunctions from "../../utils/format";
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
 
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      await axios.delete(`http://localhost:3000/orders/${orderId}`);
+      const updatedOrders = orders.filter((order) => order.id !== orderId);
+      setOrders(updatedOrders);
+    } catch (error) {
+      console.error("Error deleting order:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -31,16 +41,17 @@ const OrdersPage = () => {
   return (
     <div>
       <Typography variant="h2">Lista de Pedidos</Typography>
-      <Button component={Link} to={"/"} variant="contained" color="primary">
-        Volver
-      </Button>
       <Button
         component={Link}
         to={"/nuevo-pedido"}
         variant="contained"
         color="primary"
+        sx={{ marginRight: 2 }}
       >
         Crear nuevo pedido
+      </Button>
+      <Button component={Link} to={"/"} variant="contained" color="primary">
+        Volver
       </Button>
       <Table>
         <TableHead>
@@ -67,8 +78,16 @@ const OrdersPage = () => {
                   to={`/pedido/${order.id}`}
                   variant="contained"
                   color="primary"
+                  sx={{ marginRight: 2 }}
                 >
                   Ver Detalles
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleDeleteOrder(order.id)}
+                >
+                  Borrar
                 </Button>
               </TableCell>
             </TableRow>

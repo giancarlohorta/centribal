@@ -259,21 +259,31 @@ const OrderDetailsPage = () => {
             color="primary"
             onClick={handleSaveChanges}
             disabled={!orderChanged}
+            sx={{ marginRight: 2 }}
           >
             Guardar Cambios
           </Button>
-          <Button variant="contained" color="primary" onClick={handleCancel}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCancel}
+            sx={{ marginRight: 2 }}
+          >
             Cancelar
           </Button>
         </>
       ) : (
-        <Button variant="contained" onClick={handleEditButtonClick}>
+        <Button
+          variant="contained"
+          onClick={handleEditButtonClick}
+          sx={{ marginRight: 2 }}
+        >
           Editar Pedido
         </Button>
       )}
 
       <Button component={Link} to="/pedidos" variant="contained">
-        Voltar para Pedidos
+        Volver
       </Button>
     </div>
   );

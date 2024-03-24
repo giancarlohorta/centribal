@@ -11,7 +11,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import parseFunctions from "../../utils/format";
 
-const ArticlesList = ({ list }) => {
+const ArticlesList = ({ list, onDelete }) => {
   return (
     <Table>
       <TableHead>
@@ -36,8 +36,16 @@ const ArticlesList = ({ list }) => {
                 to={`/articulo/${article.id}`}
                 variant="contained"
                 color="primary"
+                sx={{ marginRight: 2 }}
               >
                 Ver Detalles
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => onDelete(article.id)}
+              >
+                Borrar
               </Button>
             </TableCell>
           </TableRow>
@@ -55,6 +63,7 @@ ArticlesList.propTypes = {
       price: PropTypes.number.isRequired,
     })
   ).isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default ArticlesList;
