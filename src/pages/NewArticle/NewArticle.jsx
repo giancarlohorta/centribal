@@ -13,6 +13,7 @@ const NewArticlePage = () => {
     description: "",
     price: "",
     tax: "",
+    quantity: "",
   });
   const [existingReferences, setExistingReferences] = useState([]);
 

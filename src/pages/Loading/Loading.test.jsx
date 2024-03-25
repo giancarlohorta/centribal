@@ -1,8 +1,10 @@
-// import { render, screen } from "@testing-library/react";
-// import Loading from "../Loading";
+import { render, screen } from "@testing-library/react";
+import Loading from "../Loading";
 
-// describe("Loading", () => {
-//   render(<Loading />);
-//   const text = screen.getByText("Carregando...");
-//   expect(text).toBeInTheDocument();
-// });
+describe("Loading", () => {
+  it("test", () => {
+    render(<Loading />);
+    const text = screen.getByText("Carregando...");
+    expect(text).toBeInTheDocument();
+  });
+});

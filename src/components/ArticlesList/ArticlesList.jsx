@@ -58,6 +58,7 @@ const ArticlesList = ({ list, onDelete }) => {
 ArticlesList.propTypes = {
   list: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.string.isRequired,
       ref: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       price: PropTypes.number.isRequired,

@@ -22,7 +22,11 @@ const OrderItem = ({ item, onClick, edit, addActions }) => {
             onChange={(e) => setSelectedQuantity(e.target.value)}
           >
             {[...Array(limitQuantity)].map((_, index) => (
-              <MenuItem key={index + 1} value={index + 1}>
+              <MenuItem
+                key={index + 1}
+                value={index + 1}
+                data-testid={`quantity-option-${index + 1}`}
+              >
                 {index + 1}
               </MenuItem>
             ))}

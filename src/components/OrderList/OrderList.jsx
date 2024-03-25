@@ -2,6 +2,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
 } from "@mui/material";
@@ -10,29 +11,31 @@ import PropTypes from "prop-types";
 
 const OrderList = ({ list, edit, onClick, addActions }) => {
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Ref</TableCell>
-          <TableCell>Nombre</TableCell>
-          <TableCell>Descripción</TableCell>
-          <TableCell>Precio</TableCell>
-          <TableCell>Cantidad</TableCell>
-          {edit && <TableCell>Acción</TableCell>}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {list.map((item) => (
-          <OrderItem
-            item={item}
-            key={item.id}
-            onClick={onClick}
-            edit={edit}
-            addActions={addActions}
-          />
-        ))}
-      </TableBody>
-    </Table>
+    <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Ref</TableCell>
+            <TableCell>Nombre</TableCell>
+            <TableCell>Descripción</TableCell>
+            <TableCell>Precio</TableCell>
+            <TableCell>Cantidad</TableCell>
+            {edit && <TableCell>Acción</TableCell>}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {list.map((item) => (
+            <OrderItem
+              item={item}
+              key={item.id}
+              onClick={onClick}
+              edit={edit}
+              addActions={addActions}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 
