@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
-import { Typography, Button, Grid } from "@mui/material";
+import { Typography, Button, Grid, Snackbar, Alert } from "@mui/material";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import ArticleForm from "../../components/ArticleForm";
 import parseFunctions from "../../utils/format";
+
+const snackbarInitial = {
+  open: false,
+  message: "",
+  state: "",
+};
 
 const NewArticlePage = () => {
   const navigate = useNavigate();
@@ -11,25 +17,11 @@ const NewArticlePage = () => {
     ref: "",
     name: "",
     description: "",
-    price: "",
-    tax: "",
-    quantity: "",
+    price: 0,
+    tax: 0,
+    quantity: 0,
   });
-  const [existingReferences, setExistingReferences] = useState([]);
-
-  useEffect(() => {
-    const fetchExistingReferences = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/articles");
-        const references = response.data.map((article) => article.ref);
-        setExistingReferences(references);
-      } catch (error) {
-        console.error("Error fetching existing references:", error);
-      }
-    };
-
-    fetchExistingReferences();
-  }, []);
+  const [snackbar, setSnackbar] = useState(snackbarInitial);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -39,19 +31,24 @@ const NewArticlePage = () => {
     });
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbar(snackbarInitial);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const { referencia } = formData;
     const parsedData = parseFunctions.parsedValue(formData);
-    if (existingReferences.includes(referencia)) {
-      alert("Esta referencia ya está en uso. Por favor, elija otra.");
-      return;
-    }
+
     try {
       await axios.post("http://localhost:3000/articles", parsedData);
       navigate("/articulos");
     } catch (error) {
       console.error("Erro ao criar um novo artigo:", error);
+      setSnackbar({
+        open: true,
+        message: "error al crear el articulo, inténtelo de nuevo",
+        state: "error",
+      });
     }
   };
 
@@ -84,6 +81,31 @@ const NewArticlePage = () => {
           </Grid>
         </Grid>
       </form>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.state}
+          variant="filled"
+          sx={{ width: "100%" }}
+          action={
+            snackbar.state === "error" && (
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => handleSaveButtonClick()}
+              >
+                Retry
+              </Button>
+            )
+          }
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
