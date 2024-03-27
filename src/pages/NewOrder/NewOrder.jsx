@@ -10,14 +10,25 @@ import {
   TableRow,
   TableHead,
   Table,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import OrderItem from "../../components/OrderItem";
 import OrderList from "../../components/OrderList";
 import parseFunctions from "../../utils/format";
+import constants from "../../constants/constants";
+
+const { FETCH_STATUS } = constants;
 
 const initialValue = {
   id: "",
+};
+
+const snackbarInitial = {
+  open: false,
+  message: "",
+  state: "",
 };
 
 const CreateOrderPage = () => {
@@ -30,17 +41,26 @@ const CreateOrderPage = () => {
     totalWithTax: 0,
     items: [],
   });
+  const [snackbar, setSnackbar] = useState(snackbarInitial);
+  const [fetchStatus, setFetchStatus] = useState(FETCH_STATUS.INITIAL);
+
+  const error = fetchStatus === FETCH_STATUS.ERROR;
+  const loading = fetchStatus === FETCH_STATUS.LOADING;
+  const done = fetchStatus === FETCH_STATUS.DONE;
+
+  const fetchArticles = async () => {
+    try {
+      setFetchStatus(FETCH_STATUS.LOADING);
+      const response = await axios.get("http://localhost:3000/articles");
+      setArticles(response.data);
+      setFetchStatus(FETCH_STATUS.DONE);
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+      setFetchStatus(FETCH_STATUS.ERROR);
+    }
+  };
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/articles");
-        setArticles(response.data);
-      } catch (error) {
-        console.error("Error fetching articles:", error);
-      }
-    };
-
     fetchArticles();
   }, []);
   useEffect(() => {
@@ -51,6 +71,10 @@ const CreateOrderPage = () => {
       setAvailableArticles(available);
     }
   }, [order, articles]);
+
+  const handleSnackbarClose = () => {
+    setSnackbar(snackbarInitial);
+  };
 
   const handleCreateOrder = async () => {
     try {
@@ -71,6 +95,11 @@ const CreateOrderPage = () => {
       );
     } catch (error) {
       console.error("Error saving changes:", error);
+      setSnackbar({
+        open: true,
+        message: "error al crear el pedido, inténtelo de nuevo",
+        state: "error",
+      });
     }
   };
 
@@ -123,6 +152,11 @@ const CreateOrderPage = () => {
     }
   };
 
+  const handleRetry = () => {
+    setFetchStatus(FETCH_STATUS.INITIAL);
+    fetchArticles();
+  };
+
   const handleRemoveArticle = (id, quantity) => {
     const existingItemIndex = order.items.findIndex((item) => item.id === id);
 
@@ -167,66 +201,113 @@ const CreateOrderPage = () => {
     setArticles(updatedArticles);
   };
 
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
   return (
     <div>
-      <Typography variant="h2">Crear Nuevo Pedido</Typography>
-      <div>
-        <Typography variant="h6">Seleccione un Artículo:</Typography>
-        <Select
-          value={selectedArticle.id}
-          onChange={handleChangeSelectArticle}
-          fullWidth
-        >
-          {availableArticles.map((article) => (
-            <MenuItem key={article.id} value={article.id}>
-              {article.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </div>
-      <Typography variant="h6">Artículo seleccionado:</Typography>
-      {selectedArticle.id && (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Ref</TableCell>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Descripción</TableCell>
-              <TableCell>Precio</TableCell>
-              <TableCell>Cantidad</TableCell>
-              <TableCell>Acción</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <OrderItem
-              item={selectedArticle}
-              edit
-              addActions
-              onClick={handleAddArticle}
-            />
-          </TableBody>
-        </Table>
+      <Typography variant="h2">Crear Nuevo Pedido</Typography>{" "}
+      {error && (
+        <div>
+          <Typography variant="body1" color="error">
+            Error en la búsqueda de articulos. Por favor, inténtelo de nuevo.
+          </Typography>
+          <Button variant="contained" color="primary" onClick={handleRetry}>
+            Inténtalo de nuevo
+          </Button>
+        </div>
       )}
-      <Typography variant="h6">Pedido:</Typography>
-      <Typography>
-        Total: {parseFunctions.formatedCurrency(order.total)}
-      </Typography>
-      <Typography>
-        Total con Impuestos:
-        {parseFunctions.formatedCurrency(order.totalWithTax)}
-      </Typography>
-      <OrderList list={order.items} edit onClick={handleRemoveArticle} />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleCreateOrder}
-        sx={{ marginRight: 2 }}
-      >
-        Crear Pedido
-      </Button>
-      <Button component={Link} to="/pedidos" variant="contained">
-        Volver
-      </Button>
+      {done && (
+        <>
+          <div>
+            <Typography variant="h6">Seleccione un Artículo:</Typography>
+            <Select
+              value={selectedArticle.id}
+              onChange={handleChangeSelectArticle}
+              fullWidth
+            >
+              {availableArticles.map((article) => (
+                <MenuItem
+                  key={article.id}
+                  value={article.id}
+                  data-testid={article.id}
+                >
+                  {article.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </div>
+          <Typography variant="h6">Artículo seleccionado:</Typography>
+          {selectedArticle.id && (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Ref</TableCell>
+                  <TableCell>Nombre</TableCell>
+                  <TableCell>Descripción</TableCell>
+                  <TableCell>Precio</TableCell>
+                  <TableCell>Cantidad</TableCell>
+                  <TableCell>Acción</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <OrderItem
+                  item={selectedArticle}
+                  edit
+                  addActions
+                  onClick={handleAddArticle}
+                />
+              </TableBody>
+            </Table>
+          )}
+          <Typography variant="h6">Pedido:</Typography>
+          <Typography>
+            Total: {parseFunctions.formatedCurrency(order.total)}
+          </Typography>
+          <Typography>
+            Total con Impuestos:
+            {parseFunctions.formatedCurrency(order.totalWithTax)}
+          </Typography>
+          <OrderList list={order.items} edit onClick={handleRemoveArticle} />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreateOrder}
+            sx={{ marginRight: 2 }}
+          >
+            Crear Pedido
+          </Button>
+          <Button component={Link} to="/pedidos" variant="contained">
+            Volver
+          </Button>
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={3000}
+            onClose={handleSnackbarClose}
+          >
+            <Alert
+              onClose={handleSnackbarClose}
+              severity={snackbar.state}
+              variant="filled"
+              sx={{ width: "100%" }}
+              action={
+                snackbar.state === "error" && (
+                  <Button
+                    color="inherit"
+                    size="small"
+                    onClick={() => handleCreateOrder()}
+                  >
+                    Retry
+                  </Button>
+                )
+              }
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+        </>
+      )}
     </div>
   );
 };

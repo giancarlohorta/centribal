@@ -17,13 +17,22 @@ const resultArticles = [
     tax: 0.2,
     quantity: 60,
   },
+  {
+    id: "1",
+    ref: "REF123",
+    name: "Artículo 1a",
+    description: "Descripción del artículo 1",
+    price: 11,
+    tax: 0.25,
+    quantity: 1,
+  },
 ];
 
 const resultOrders = [
   {
     id: "f6b4",
-    total: 32,
-    totalWithTax: 38.95,
+    total: 53,
+    totalWithTax: 64.15,
     items: [
       {
         id: "1",

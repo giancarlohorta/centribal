@@ -96,7 +96,7 @@ const NewArticlePage = () => {
               <Button
                 color="inherit"
                 size="small"
-                onClick={() => handleSaveButtonClick()}
+                onClick={() => handleSubmit()}
               >
                 Retry
               </Button>

@@ -1,6 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import NewArticle from "./NewArticle";
-import mockResult from "../../constants/mock";
 import { BrowserRouter } from "react-router-dom";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
@@ -9,6 +8,13 @@ const mock = new MockAdapter(axios);
 const mockPostAction = (status) => {
   mock.onPost("http://localhost:3000/articles").reply(status);
 };
+
+const mockedUsedNavigate = jest.fn();
+
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockedUsedNavigate,
+}));
 
 const NewArticleMock = () => {
   return (
@@ -114,7 +120,5 @@ describe("NewArticle", () => {
     });
     expect(errorMessage).toBeInTheDocument();
     expect(retryButton).toBeInTheDocument();
-    mockPostAction(200);
-    fireEvent.click(createButton);
   });
 });
