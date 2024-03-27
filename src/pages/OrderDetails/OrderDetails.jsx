@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Typography, Button, Snackbar, Alert } from "@mui/material";
+import { Typography, Button } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import parseFunctions from "../../utils/format";
 import OrderList from "../../components/OrderList";
 import constants from "../../constants/constants";
+import ErrorMessage from "../../components/ErrorMessage";
+import SnackbarNotification from "../../components/SnackbarNotification";
 
-const { FETCH_STATUS } = constants;
-
-const snackbarInitial = {
-  open: false,
-  message: "",
-  state: "",
-};
+const { FETCH_STATUS, SNACKBAR_INITIAL } = constants;
 
 const OrderDetails = () => {
   const { id: orderId } = useParams();
@@ -21,10 +17,8 @@ const OrderDetails = () => {
   const [fetchStatusOrders, setFetchStatusOrders] = useState(
     FETCH_STATUS.INITIAL
   );
-  const [fetchStatusArticles, setFetchStatusArticles] = useState(
-    FETCH_STATUS.INITIAL
-  );
-  const [snackbar, setSnackbar] = useState(snackbarInitial);
+
+  const [snackbar, setSnackbar] = useState(SNACKBAR_INITIAL);
   const [articles, setArticles] = useState([]);
   const [availableArticles, setAvailableArticles] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -49,34 +43,14 @@ const OrderDetails = () => {
     }
   };
 
-  useEffect(() => {
-    fetchOrderDetails();
-  }, [orderId]);
-
-  useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        setFetchStatusArticles(FETCH_STATUS.LOADING);
-        const response = await axios.get("http://localhost:3000/articles");
-        setArticles(response.data);
-        setFetchStatusArticles(FETCH_STATUS.DONE);
-      } catch (error) {
-        console.error("Error fetching articles:", error);
-        setFetchStatusArticles(FETCH_STATUS.ERROR);
-      }
-    };
-
-    fetchArticles();
-  }, []);
-
-  useEffect(() => {
-    if (order && articles.length > 0) {
-      const available = articles.filter((article) => {
-        return !order.items.some((item) => item.id === article.id);
-      });
-      setAvailableArticles(available);
+  const fetchArticles = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/articles");
+      setArticles(response.data);
+    } catch (error) {
+      console.error("Error fetching articles:", error);
     }
-  }, [order, articles]);
+  };
 
   const calculateItemDifferences = (currentItems, initialItems) => {
     const differences = [];
@@ -212,7 +186,7 @@ const OrderDetails = () => {
     setArticles(updatedArticles);
   };
 
-  const handleEditButtonClick = () => {
+  const handleEdit = () => {
     setIsEditing(!isEditing);
   };
 
@@ -265,8 +239,25 @@ const OrderDetails = () => {
   };
 
   const handleSnackbarClose = () => {
-    setSnackbar(snackbarInitial);
+    setSnackbar(SNACKBAR_INITIAL);
   };
+
+  useEffect(() => {
+    fetchOrderDetails();
+  }, [orderId]);
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  useEffect(() => {
+    if (order && articles.length > 0) {
+      const available = articles.filter((article) => {
+        return !order.items.some((item) => item.id === article.id);
+      });
+      setAvailableArticles(available);
+    }
+  }, [order, articles]);
 
   if (loadingOrders) {
     return <div>Loading...</div>;
@@ -326,7 +317,7 @@ const OrderDetails = () => {
           ) : (
             <Button
               variant="contained"
-              onClick={handleEditButtonClick}
+              onClick={handleEdit}
               sx={{ marginRight: 2 }}
             >
               Editar Pedido
@@ -335,42 +326,19 @@ const OrderDetails = () => {
           <Button component={Link} to="/pedidos" variant="contained">
             Volver
           </Button>
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={3000}
+
+          <SnackbarNotification
+            data={snackbar}
             onClose={handleSnackbarClose}
-          >
-            <Alert
-              onClose={handleSnackbarClose}
-              severity={snackbar.state}
-              variant="filled"
-              sx={{ width: "100%" }}
-              action={
-                snackbar.state === "error" && (
-                  <Button
-                    color="inherit"
-                    size="small"
-                    onClick={() => handleSaveChanges()}
-                  >
-                    Retry
-                  </Button>
-                )
-              }
-            >
-              {snackbar.message}
-            </Alert>
-          </Snackbar>
+            onRetry={handleSaveChanges}
+          />
         </>
       )}
       {errorOrders && (
-        <div>
-          <Typography variant="body1" color="error">
-            Error en la búsqueda del pedido. Por favor, inténtelo de nuevo.
-          </Typography>
-          <Button variant="contained" color="primary" onClick={handleRetry}>
-            Inténtalo de nuevo
-          </Button>
-        </div>
+        <ErrorMessage
+          message="Error en la búsqueda del pedido. Por favor, inténtelo de nuevo."
+          onRetray={handleRetry}
+        />
       )}
     </div>
   );

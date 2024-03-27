@@ -1,15 +1,13 @@
-import { useState, useEffect } from "react";
-import { Typography, Button, Grid, Snackbar, Alert } from "@mui/material";
+import { useState } from "react";
+import { Typography, Button, Grid } from "@mui/material";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import ArticleForm from "../../components/ArticleForm";
 import parseFunctions from "../../utils/format";
+import SnackbarNotification from "../../components/SnackbarNotification";
+import constants from "../../constants/constants";
 
-const snackbarInitial = {
-  open: false,
-  message: "",
-  state: "",
-};
+const { SNACKBAR_INITIAL } = constants;
 
 const NewArticlePage = () => {
   const navigate = useNavigate();
@@ -21,9 +19,9 @@ const NewArticlePage = () => {
     tax: 0,
     quantity: 0,
   });
-  const [snackbar, setSnackbar] = useState(snackbarInitial);
+  const [snackbar, setSnackbar] = useState(SNACKBAR_INITIAL);
 
-  const handleInputChange = (event) => {
+  const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({
       ...formData,
@@ -32,7 +30,7 @@ const NewArticlePage = () => {
   };
 
   const handleSnackbarClose = () => {
-    setSnackbar(snackbarInitial);
+    setSnackbar(SNACKBAR_INITIAL);
   };
 
   const handleSubmit = async (event) => {
@@ -57,10 +55,7 @@ const NewArticlePage = () => {
       <Typography variant="h2">Crear Nuevo Artículo</Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <ArticleForm
-            editedArticle={formData}
-            onInputChange={handleInputChange}
-          />
+          <ArticleForm editedArticle={formData} onInputChange={handleChange} />
           <Grid item xs={12}>
             <Button
               type="submit"
@@ -81,31 +76,11 @@ const NewArticlePage = () => {
           </Grid>
         </Grid>
       </form>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
+      <SnackbarNotification
+        data={snackbar}
         onClose={handleSnackbarClose}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.state}
-          variant="filled"
-          sx={{ width: "100%" }}
-          action={
-            snackbar.state === "error" && (
-              <Button
-                color="inherit"
-                size="small"
-                onClick={() => handleSubmit()}
-              >
-                Retry
-              </Button>
-            )
-          }
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+        onRetry={handleSubmit}
+      />
     </div>
   );
 };

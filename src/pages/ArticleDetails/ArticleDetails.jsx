@@ -1,26 +1,23 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Typography, Button, Grid, Snackbar, Alert } from "@mui/material";
+import { Typography, Button, Grid } from "@mui/material";
 import axios from "axios";
 import ArticleForm from "../../components/ArticleForm";
 import parseFunctions from "../../utils/format";
 import constants from "../../constants/constants";
+import ErrorMessage from "../../components/ErrorMessage";
+import SnackbarNotification from "../../components/SnackbarNotification";
 
-const { FETCH_STATUS } = constants;
-
-const snackbarInitial = {
-  open: false,
-  message: "",
-  state: "",
-};
+const { FETCH_STATUS, SNACKBAR_INITIAL } = constants;
 
 const ArticleDetails = () => {
   const { id } = useParams();
   const [article, setArticle] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [editedArticle, setEditedArticle] = useState(null);
   const [originalArticle, setOriginalArticle] = useState(null);
-  const [snackbar, setSnackbar] = useState(snackbarInitial);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [snackbar, setSnackbar] = useState(SNACKBAR_INITIAL);
   const [fetchStatus, setFetchStatus] = useState(FETCH_STATUS.INITIAL);
 
   const error = fetchStatus === FETCH_STATUS.ERROR;
@@ -41,15 +38,12 @@ const ArticleDetails = () => {
       setFetchStatus(FETCH_STATUS.ERROR);
     }
   };
-  useEffect(() => {
-    fetchArticle();
-  }, [id]);
 
-  const handleEditButtonClick = () => {
+  const handleEditArticle = () => {
     setIsEditing(true);
   };
 
-  const handleSaveButtonClick = async () => {
+  const handleSaveChanges = async () => {
     const parsedData = parseFunctions.parsedValue(editedArticle);
     try {
       await axios.put(`http://localhost:3000/articles/${id}`, parsedData);
@@ -71,10 +65,10 @@ const ArticleDetails = () => {
   };
 
   const handleSnackbarClose = () => {
-    setSnackbar(snackbarInitial);
+    setSnackbar(SNACKBAR_INITIAL);
   };
 
-  const handleCancelButtonClick = () => {
+  const handleCancelEdit = () => {
     setEditedArticle(originalArticle);
     setIsEditing(false);
   };
@@ -84,13 +78,17 @@ const ArticleDetails = () => {
     fetchArticle();
   };
 
-  const handleInputChange = (event) => {
+  const handleChange = (event) => {
     const { name, value } = event.target;
     setEditedArticle({
       ...editedArticle,
       [name]: value,
     });
   };
+
+  useEffect(() => {
+    fetchArticle();
+  }, [id]);
 
   if (loading) {
     return <div>Carregando...</div>;
@@ -100,14 +98,10 @@ const ArticleDetails = () => {
     <div>
       <Typography variant="h2">Detalhes do Artigo</Typography>
       {error && (
-        <div>
-          <Typography variant="body1" color="error">
-            Error en la búsqueda del artículo. Por favor, inténtelo de nuevo.
-          </Typography>
-          <Button variant="contained" color="primary" onClick={handleRetry}>
-            Inténtalo de nuevo
-          </Button>
-        </div>
+        <ErrorMessage
+          message="Error en la búsqueda del artículo. Por favor, inténtelo de nuevo."
+          onRetray={handleRetry}
+        />
       )}
       {done && (
         <Grid container spacing={2}>
@@ -115,17 +109,17 @@ const ArticleDetails = () => {
             <>
               <ArticleForm
                 editedArticle={editedArticle}
-                onInputChange={handleInputChange}
+                onInputChange={handleChange}
               />
               <Grid item xs={12}>
                 <Button
                   variant="contained"
-                  onClick={handleSaveButtonClick}
+                  onClick={handleSaveChanges}
                   sx={{ marginRight: 2 }}
                 >
                   Salvar
                 </Button>
-                <Button variant="contained" onClick={handleCancelButtonClick}>
+                <Button variant="contained" onClick={handleCancelEdit}>
                   Cancelar
                 </Button>
               </Grid>
@@ -156,7 +150,7 @@ const ArticleDetails = () => {
               <Grid item xs={12}>
                 <Button
                   variant="contained"
-                  onClick={handleEditButtonClick}
+                  onClick={handleEditArticle}
                   sx={{ marginRight: 2 }}
                 >
                   Editar
@@ -172,32 +166,11 @@ const ArticleDetails = () => {
               </Grid>
             </>
           )}
-
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={3000}
+          <SnackbarNotification
+            data={snackbar}
             onClose={handleSnackbarClose}
-          >
-            <Alert
-              onClose={handleSnackbarClose}
-              severity={snackbar.state}
-              variant="filled"
-              sx={{ width: "100%" }}
-              action={
-                snackbar.state === "error" && (
-                  <Button
-                    color="inherit"
-                    size="small"
-                    onClick={() => handleSaveButtonClick()}
-                  >
-                    Retry
-                  </Button>
-                )
-              }
-            >
-              {snackbar.message}
-            </Alert>
-          </Snackbar>
+            onRetry={handleSaveChanges}
+          />
         </Grid>
       )}
     </div>

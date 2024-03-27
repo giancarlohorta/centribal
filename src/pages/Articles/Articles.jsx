@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
 import ArticlesList from "../../components/ArticlesList/ArticlesList";
 import axios from "axios";
-import { Alert, Button, Snackbar, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import constants from "../../constants/constants";
+import ErrorMessage from "../../components/ErrorMessage";
+import SnackbarNotification from "../../components/SnackbarNotification";
 
-const { FETCH_STATUS } = constants;
-
-const snackbarInitial = {
-  open: false,
-  message: "",
-  articleId: "",
-  state: "",
-};
+const { FETCH_STATUS, SNACKBAR_INITIAL } = constants;
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);
   const [fetchStatus, setFetchStatus] = useState(FETCH_STATUS.INITIAL);
-  const [snackbar, setSnackbar] = useState(snackbarInitial);
+  const [snackbar, setSnackbar] = useState(SNACKBAR_INITIAL);
 
   const error = fetchStatus === FETCH_STATUS.ERROR;
   const loading = fetchStatus === FETCH_STATUS.LOADING;
@@ -61,7 +56,7 @@ const Articles = () => {
   };
 
   const handleSnackbarClose = () => {
-    setSnackbar(snackbarInitial);
+    setSnackbar(SNACKBAR_INITIAL);
   };
 
   const handleRetry = () => {
@@ -93,43 +88,19 @@ const Articles = () => {
         Volver
       </Button>
       {error && (
-        <div>
-          <Typography variant="body1" color="error">
-            Error en la búsqueda de artículos. Por favor, inténtelo de nuevo.
-          </Typography>
-          <Button variant="contained" color="primary" onClick={handleRetry}>
-            Inténtalo de nuevo
-          </Button>
-        </div>
+        <ErrorMessage
+          message="Error en la búsqueda de artículos. Por favor, inténtelo de nuevo."
+          onRetray={handleRetry}
+        />
       )}
       {done && (
         <>
           <ArticlesList list={articles} onDelete={handleDeleteArticle} />
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={3000}
+          <SnackbarNotification
+            data={snackbar}
             onClose={handleSnackbarClose}
-          >
-            <Alert
-              onClose={handleSnackbarClose}
-              severity={snackbar.state}
-              variant="filled"
-              sx={{ width: "100%" }}
-              action={
-                snackbar.state === "error" && (
-                  <Button
-                    color="inherit"
-                    size="small"
-                    onClick={() => handleDeleteArticle(snackbar.articleId)}
-                  >
-                    Retry
-                  </Button>
-                )
-              }
-            >
-              {snackbar.message}
-            </Alert>
-          </Snackbar>
+            onRetry={() => handleDeleteArticle(snackbar.articleId)}
+          />
         </>
       )}
     </div>

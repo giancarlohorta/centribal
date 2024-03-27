@@ -6,8 +6,15 @@ const FETCH_STATUS = {
   LOADING: "LOADING",
 };
 
+const SNACKBAR_INITIAL = {
+  open: false,
+  message: "",
+  state: "",
+};
+
 const constants = {
   FETCH_STATUS,
+  SNACKBAR_INITIAL,
 };
 
 export default constants;

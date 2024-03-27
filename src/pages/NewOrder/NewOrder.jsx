@@ -10,25 +10,19 @@ import {
   TableRow,
   TableHead,
   Table,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import OrderItem from "../../components/OrderItem";
 import OrderList from "../../components/OrderList";
 import parseFunctions from "../../utils/format";
 import constants from "../../constants/constants";
+import ErrorMessage from "../../components/ErrorMessage";
+import SnackbarNotification from "../../components/SnackbarNotification";
 
-const { FETCH_STATUS } = constants;
+const { FETCH_STATUS, SNACKBAR_INITIAL } = constants;
 
 const initialValue = {
   id: "",
-};
-
-const snackbarInitial = {
-  open: false,
-  message: "",
-  state: "",
 };
 
 const CreateOrderPage = () => {
@@ -41,7 +35,7 @@ const CreateOrderPage = () => {
     totalWithTax: 0,
     items: [],
   });
-  const [snackbar, setSnackbar] = useState(snackbarInitial);
+  const [snackbar, setSnackbar] = useState(SNACKBAR_INITIAL);
   const [fetchStatus, setFetchStatus] = useState(FETCH_STATUS.INITIAL);
 
   const error = fetchStatus === FETCH_STATUS.ERROR;
@@ -60,20 +54,8 @@ const CreateOrderPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchArticles();
-  }, []);
-  useEffect(() => {
-    if (order && articles.length > 0) {
-      const available = articles.filter((article) => {
-        return !order.items.some((item) => item.id === article.id);
-      });
-      setAvailableArticles(available);
-    }
-  }, [order, articles]);
-
   const handleSnackbarClose = () => {
-    setSnackbar(snackbarInitial);
+    setSnackbar(SNACKBAR_INITIAL);
   };
 
   const handleCreateOrder = async () => {
@@ -152,11 +134,6 @@ const CreateOrderPage = () => {
     }
   };
 
-  const handleRetry = () => {
-    setFetchStatus(FETCH_STATUS.INITIAL);
-    fetchArticles();
-  };
-
   const handleRemoveArticle = (id, quantity) => {
     const existingItemIndex = order.items.findIndex((item) => item.id === id);
 
@@ -201,22 +178,36 @@ const CreateOrderPage = () => {
     setArticles(updatedArticles);
   };
 
+  const handleRetry = () => {
+    setFetchStatus(FETCH_STATUS.INITIAL);
+    fetchArticles();
+  };
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  useEffect(() => {
+    if (order && articles.length > 0) {
+      const available = articles.filter((article) => {
+        return !order.items.some((item) => item.id === article.id);
+      });
+      setAvailableArticles(available);
+    }
+  }, [order, articles]);
+
   if (loading) {
     return <div>Carregando...</div>;
   }
 
   return (
     <div>
-      <Typography variant="h2">Crear Nuevo Pedido</Typography>{" "}
+      <Typography variant="h2">Crear Nuevo Pedido</Typography>
       {error && (
-        <div>
-          <Typography variant="body1" color="error">
-            Error en la búsqueda de articulos. Por favor, inténtelo de nuevo.
-          </Typography>
-          <Button variant="contained" color="primary" onClick={handleRetry}>
-            Inténtalo de nuevo
-          </Button>
-        </div>
+        <ErrorMessage
+          message="Error en la búsqueda de articulos. Por favor, inténtelo de nuevo."
+          onRetray={handleRetry}
+        />
       )}
       {done && (
         <>
@@ -281,31 +272,11 @@ const CreateOrderPage = () => {
           <Button component={Link} to="/pedidos" variant="contained">
             Volver
           </Button>
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={3000}
+          <SnackbarNotification
+            data={snackbar}
             onClose={handleSnackbarClose}
-          >
-            <Alert
-              onClose={handleSnackbarClose}
-              severity={snackbar.state}
-              variant="filled"
-              sx={{ width: "100%" }}
-              action={
-                snackbar.state === "error" && (
-                  <Button
-                    color="inherit"
-                    size="small"
-                    onClick={() => handleCreateOrder()}
-                  >
-                    Retry
-                  </Button>
-                )
-              }
-            >
-              {snackbar.message}
-            </Alert>
-          </Snackbar>
+            onRetry={handleCreateOrder}
+          />
         </>
       )}
     </div>
