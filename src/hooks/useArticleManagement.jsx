@@ -5,19 +5,18 @@ import { useNavigate } from "react-router-dom";
 
 const { FETCH_STATUS, SNACKBAR_INITIAL } = constants;
 
-const useArticleManagement = (id) => {
+const useFetchArticle = () => {
   const navigate = useNavigate();
   const [article, setArticle] = useState({});
   const [articles, setArticles] = useState({});
   const [snackbarStatus, setSnackbarStatus] = useState(SNACKBAR_INITIAL);
   const [fetchStatus, setFetchStatus] = useState(FETCH_STATUS.INITIAL);
 
-  const fetchArticle = async () => {
+  const fetchArticle = async (id) => {
     try {
       setFetchStatus(FETCH_STATUS.LOADING);
       const response = await axios.get(`http://localhost:3000/articles/${id}`);
       const data = response.data;
-      console.log(data);
       setArticle(data);
       setFetchStatus(FETCH_STATUS.DONE);
     } catch (error) {
@@ -39,7 +38,7 @@ const useArticleManagement = (id) => {
     }
   };
 
-  const updateArticle = async (updatedArticle) => {
+  const updateArticle = async (updatedArticle, id) => {
     try {
       const response = await axios.put(
         `http://localhost:3000/articles/${id}`,
@@ -126,4 +125,4 @@ const useArticleManagement = (id) => {
   };
 };
 
-export default useArticleManagement;
+export default useFetchArticle;

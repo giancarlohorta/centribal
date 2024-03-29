@@ -18,7 +18,7 @@ const ArticleDetails = () => {
     updateArticle,
     fetchArticle,
     onSnackBarClose,
-  } = useArticleManagement(id);
+  } = useArticleManagement();
 
   const [editedArticle, setEditedArticle] = useState(null);
   const [originalArticle, setOriginalArticle] = useState(null);
@@ -31,7 +31,7 @@ const ArticleDetails = () => {
 
   const handleSaveChanges = async () => {
     const parsedData = parseFunctions.parsedValue(editedArticle);
-    await updateArticle(parsedData);
+    await updateArticle(parsedData, id);
   };
 
   const handleCancelEdit = () => {
@@ -40,7 +40,7 @@ const ArticleDetails = () => {
   };
 
   const handleRetry = async () => {
-    await fetchArticle();
+    await fetchArticle(id);
   };
 
   const handleChange = (event) => {
@@ -52,7 +52,7 @@ const ArticleDetails = () => {
   };
 
   useEffect(() => {
-    fetchArticle();
+    fetchArticle(id);
   }, [id]);
 
   useEffect(() => {
