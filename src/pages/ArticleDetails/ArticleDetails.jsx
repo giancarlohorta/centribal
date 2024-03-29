@@ -1,43 +1,29 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Typography, Button, Grid } from "@mui/material";
-import axios from "axios";
 import ArticleForm from "../../components/ArticleForm";
 import parseFunctions from "../../utils/format";
-import constants from "../../constants/constants";
 import ErrorMessage from "../../components/ErrorMessage";
 import SnackbarNotification from "../../components/SnackbarNotification";
-
-const { FETCH_STATUS, SNACKBAR_INITIAL } = constants;
+import useArticleManagement from "../../hooks/useArticleManagement";
 
 const ArticleDetails = () => {
   const { id } = useParams();
-  const [article, setArticle] = useState(null);
+  const {
+    article,
+    loading,
+    done,
+    error,
+    snackbarStatus,
+    updateArticle,
+    fetchArticle,
+    onSnackBarClose,
+  } = useArticleManagement(id);
+
   const [editedArticle, setEditedArticle] = useState(null);
   const [originalArticle, setOriginalArticle] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [snackbar, setSnackbar] = useState(SNACKBAR_INITIAL);
-  const [fetchStatus, setFetchStatus] = useState(FETCH_STATUS.INITIAL);
-
-  const error = fetchStatus === FETCH_STATUS.ERROR;
-  const loading = fetchStatus === FETCH_STATUS.LOADING;
-  const done = fetchStatus === FETCH_STATUS.DONE;
-
-  const fetchArticle = async () => {
-    try {
-      setFetchStatus(FETCH_STATUS.LOADING);
-      const response = await axios.get(`http://localhost:3000/articles/${id}`);
-      const data = response.data;
-      setArticle(data);
-      setEditedArticle(data);
-      setOriginalArticle(data);
-      setFetchStatus(FETCH_STATUS.DONE);
-    } catch (error) {
-      console.error("Erro ao buscar os detalhes do artigo:", error);
-      setFetchStatus(FETCH_STATUS.ERROR);
-    }
-  };
 
   const handleEditArticle = () => {
     setIsEditing(true);
@@ -45,27 +31,7 @@ const ArticleDetails = () => {
 
   const handleSaveChanges = async () => {
     const parsedData = parseFunctions.parsedValue(editedArticle);
-    try {
-      await axios.put(`http://localhost:3000/articles/${id}`, parsedData);
-      setArticle(editedArticle);
-      setIsEditing(false);
-      setSnackbar({
-        open: true,
-        message: "cambio guardado correctamente",
-        state: "success",
-      });
-    } catch (error) {
-      console.error("Erro ao salvar os detalhes do artigo:", error);
-      setSnackbar({
-        open: true,
-        message: "error al guardar los cambios, inténtelo de nuevo",
-        state: "error",
-      });
-    }
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbar(SNACKBAR_INITIAL);
+    await updateArticle(parsedData);
   };
 
   const handleCancelEdit = () => {
@@ -73,9 +39,8 @@ const ArticleDetails = () => {
     setIsEditing(false);
   };
 
-  const handleRetry = () => {
-    setFetchStatus(FETCH_STATUS.INITIAL);
-    fetchArticle();
+  const handleRetry = async () => {
+    await fetchArticle();
   };
 
   const handleChange = (event) => {
@@ -89,6 +54,14 @@ const ArticleDetails = () => {
   useEffect(() => {
     fetchArticle();
   }, [id]);
+
+  useEffect(() => {
+    if (article) {
+      setEditedArticle(article);
+      setOriginalArticle(article);
+      setIsEditing(false);
+    }
+  }, [article]);
 
   if (loading) {
     return <div>Carregando...</div>;
@@ -167,8 +140,8 @@ const ArticleDetails = () => {
             </>
           )}
           <SnackbarNotification
-            data={snackbar}
-            onClose={handleSnackbarClose}
+            data={snackbarStatus}
+            onClose={onSnackBarClose}
             onRetry={handleSaveChanges}
           />
         </Grid>

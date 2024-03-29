@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { Typography, Button, Grid } from "@mui/material";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ArticleForm from "../../components/ArticleForm";
 import parseFunctions from "../../utils/format";
 import SnackbarNotification from "../../components/SnackbarNotification";
-import constants from "../../constants/constants";
 
-const { SNACKBAR_INITIAL } = constants;
+import useArticleManagement from "../../hooks/useArticleManagement";
 
 const NewArticlePage = () => {
-  const navigate = useNavigate();
+  const { snackbarStatus, createArticle, onSnackBarClose } =
+    useArticleManagement();
   const [formData, setFormData] = useState({
     ref: "",
     name: "",
@@ -19,7 +18,6 @@ const NewArticlePage = () => {
     tax: 0,
     quantity: 0,
   });
-  const [snackbar, setSnackbar] = useState(SNACKBAR_INITIAL);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -29,25 +27,11 @@ const NewArticlePage = () => {
     });
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbar(SNACKBAR_INITIAL);
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     const parsedData = parseFunctions.parsedValue(formData);
 
-    try {
-      await axios.post("http://localhost:3000/articles", parsedData);
-      navigate("/articulos");
-    } catch (error) {
-      console.error("Erro ao criar um novo artigo:", error);
-      setSnackbar({
-        open: true,
-        message: "error al crear el articulo, inténtelo de nuevo",
-        state: "error",
-      });
-    }
+    await createArticle(parsedData);
   };
 
   return (
@@ -77,8 +61,8 @@ const NewArticlePage = () => {
         </Grid>
       </form>
       <SnackbarNotification
-        data={snackbar}
-        onClose={handleSnackbarClose}
+        data={snackbarStatus}
+        onClose={onSnackBarClose}
         onRetry={handleSubmit}
       />
     </div>

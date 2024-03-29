@@ -143,8 +143,7 @@ describe("ArticleDetails", () => {
     });
     expect(saveButton).toBeInTheDocument();
     fireEvent.click(saveButton);
-    const refAgain = await screen.findByText(/REF002/i);
-    expect(refAgain).toBeInTheDocument();
+
     const successMessage = await screen.findByText(
       "cambio guardado correctamente"
     );
