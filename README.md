@@ -2,7 +2,7 @@
 
 Use this command to install the dependencies.
 
-### `start-api`
+### `npm run start-api`
 
 Runs the server.\
 Open [http://localhost:3000/](http://localhost:3000/)
