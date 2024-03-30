@@ -17,6 +17,13 @@ import parseFunctions from "../../utils/format";
 import ErrorMessage from "../../components/ErrorMessage";
 import SnackbarNotification from "../../components/SnackbarNotification";
 import useOrderManagement from "../../hooks/useOrderManagement";
+import {
+  ButtonsContainer,
+  Container,
+  OrderContainer,
+  SelectContainer,
+  SelectedArticleContainer,
+} from "./NewOrderStyles";
 
 const initialValue = {
   id: "",
@@ -64,12 +71,14 @@ const CreateOrderPage = () => {
     fetchArticles();
   }, []);
 
+  const isDisabled = order.items.length === 0;
+
   if (loadingArticle) {
     return <div>Carregando...</div>;
   }
 
   return (
-    <div>
+    <Container>
       <Typography variant="h2">Crear Nuevo Pedido</Typography>
       {errorArticle && (
         <ErrorMessage
@@ -79,7 +88,7 @@ const CreateOrderPage = () => {
       )}
       {doneArticle && (
         <>
-          <div>
+          <SelectContainer elevation={4}>
             <Typography variant="h6">Seleccione un Artículo:</Typography>
             <Select
               value={selectedArticle.id}
@@ -96,50 +105,57 @@ const CreateOrderPage = () => {
                 </MenuItem>
               ))}
             </Select>
-          </div>
-          <Typography variant="h6">Artículo seleccionado:</Typography>
-          {selectedArticle.id && (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Ref</TableCell>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell>Descripción</TableCell>
-                  <TableCell>Precio</TableCell>
-                  <TableCell>Cantidad</TableCell>
-                  <TableCell>Acción</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <OrderItem
-                  item={selectedArticle}
-                  edit
-                  addActions
-                  onClick={handleAddArticle}
-                />
-              </TableBody>
-            </Table>
-          )}
-          <Typography variant="h6">Pedido:</Typography>
-          <Typography>
-            Total: {parseFunctions.formatedCurrency(order.total)}
-          </Typography>
-          <Typography>
-            Total con Impuestos:
-            {parseFunctions.formatedCurrency(order.totalWithTax)}
-          </Typography>
-          <OrderList list={order.items} edit onClick={onRemoveArticle} />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCreateOrder}
-            sx={{ marginRight: 2 }}
-          >
-            Crear Pedido
-          </Button>
-          <Button component={Link} to="/pedidos" variant="contained">
-            Volver
-          </Button>
+          </SelectContainer>
+          <SelectedArticleContainer elevation={4}>
+            <Typography variant="h6">Artículo seleccionado:</Typography>
+            {selectedArticle.id && (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Ref</TableCell>
+                    <TableCell>Nombre</TableCell>
+                    <TableCell>Descripción</TableCell>
+                    <TableCell>Precio</TableCell>
+                    <TableCell>Cantidad</TableCell>
+                    <TableCell>Acción</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <OrderItem
+                    item={selectedArticle}
+                    edit
+                    addActions
+                    onClick={handleAddArticle}
+                  />
+                </TableBody>
+              </Table>
+            )}
+          </SelectedArticleContainer>
+
+          <OrderContainer elevation={4}>
+            <Typography variant="h6">Pedido:</Typography>
+            <Typography>
+              Total: {parseFunctions.formatedCurrency(order.total)}
+            </Typography>
+            <Typography>
+              Total con Impuestos:
+              {parseFunctions.formatedCurrency(order.totalWithTax)}
+            </Typography>
+            <OrderList list={order.items} edit onClick={onRemoveArticle} />
+          </OrderContainer>
+          <ButtonsContainer>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCreateOrder}
+              disabled={isDisabled}
+            >
+              Crear Pedido
+            </Button>
+            <Button component={Link} to="/pedidos" variant="contained">
+              Volver
+            </Button>
+          </ButtonsContainer>
           <SnackbarNotification
             data={snackbar}
             onClose={onSnackbarClose}
@@ -147,7 +163,7 @@ const CreateOrderPage = () => {
           />
         </>
       )}
-    </div>
+    </Container>
   );
 };
 

@@ -78,6 +78,12 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "id": "9500",
+      "total": 0,
+      "totalWithTax": 0,
+      "items": []
     }
   ]
 }

@@ -1,11 +1,16 @@
 import { useEffect } from "react";
-import { Typography, Button } from "@mui/material";
+import { Typography, Button, Container } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import parseFunctions from "../../utils/format";
 import OrderList from "../../components/OrderList";
 import ErrorMessage from "../../components/ErrorMessage";
 import SnackbarNotification from "../../components/SnackbarNotification";
 import useOrderManagement from "../../hooks/useOrderManagement";
+import {
+  ArticlesContainer,
+  ButtonsContainer,
+  OrderContainer,
+} from "./OrderDetailsStyles";
 
 const OrderDetails = () => {
   const { id: orderId } = useParams();
@@ -49,26 +54,28 @@ const OrderDetails = () => {
   }
 
   return (
-    <div>
+    <Container>
       <Typography variant="h2">Detalles del Pedido</Typography>
       {done && (
         <>
-          <Typography>ID del Pedido: {order.id}</Typography>
-          <Typography>
-            Total: {parseFunctions.formatedCurrency(order.total)}
-          </Typography>
-          <Typography>
-            Total con Impuestos:
-            {parseFunctions.formatedCurrency(order.totalWithTax)}
-          </Typography>
-          <Typography variant="h4">Productos en el Pedido</Typography>
-          <OrderList
-            list={order.items}
-            edit={isEditing}
-            onClick={onRemoveArticle}
-          />
+          <OrderContainer elevation={4}>
+            <Typography>ID del Pedido: {order.id}</Typography>
+            <Typography>
+              Total: {parseFunctions.formatedCurrency(order.total)}
+            </Typography>
+            <Typography>
+              Total con Impuestos:
+              {parseFunctions.formatedCurrency(order.totalWithTax)}
+            </Typography>
+            <Typography variant="h4">Productos en el Pedido</Typography>
+            <OrderList
+              list={order.items}
+              edit={isEditing}
+              onClick={onRemoveArticle}
+            />
+          </OrderContainer>
           {isEditing && (
-            <>
+            <ArticlesContainer elevation={4}>
               <Typography variant="h4">Agregar Nuevo Producto</Typography>
 
               <OrderList
@@ -77,40 +84,32 @@ const OrderDetails = () => {
                 edit={isEditing}
                 addActions
               />
-            </>
+            </ArticlesContainer>
           )}
-          {isEditing ? (
-            <>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSaveChanges}
-                disabled={!orderChanged}
-                sx={{ marginRight: 2 }}
-              >
-                Guardar Cambios
+          <ButtonsContainer>
+            {isEditing ? (
+              <>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSaveChanges}
+                  disabled={!orderChanged}
+                >
+                  Guardar Cambios
+                </Button>
+                <Button variant="contained" color="primary" onClick={onCancel}>
+                  Cancelar
+                </Button>
+              </>
+            ) : (
+              <Button variant="contained" onClick={onEdit}>
+                Editar Pedido
               </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={onCancel}
-                sx={{ marginRight: 2 }}
-              >
-                Cancelar
-              </Button>
-            </>
-          ) : (
-            <Button
-              variant="contained"
-              onClick={onEdit}
-              sx={{ marginRight: 2 }}
-            >
-              Editar Pedido
+            )}
+            <Button component={Link} to="/pedidos" variant="contained">
+              Volver
             </Button>
-          )}
-          <Button component={Link} to="/pedidos" variant="contained">
-            Volver
-          </Button>
+          </ButtonsContainer>
 
           <SnackbarNotification
             data={snackbar}
@@ -125,7 +124,7 @@ const OrderDetails = () => {
           onRetray={handleRetry}
         />
       )}
-    </div>
+    </Container>
   );
 };
 

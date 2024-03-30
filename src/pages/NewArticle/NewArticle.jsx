@@ -6,6 +6,7 @@ import parseFunctions from "../../utils/format";
 import SnackbarNotification from "../../components/SnackbarNotification";
 
 import useArticleManagement from "../../hooks/useArticleManagement";
+import { Container, FormContainer } from "./NewArticleStyles";
 
 const NewArticlePage = () => {
   const { snackbarStatus, createArticle, onSnackBarClose } =
@@ -18,6 +19,8 @@ const NewArticlePage = () => {
     tax: 0,
     quantity: 0,
   });
+
+  const isDisabled = !formData.ref || !formData.name;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -35,37 +38,44 @@ const NewArticlePage = () => {
   };
 
   return (
-    <div>
+    <Container>
       <Typography variant="h2">Crear Nuevo Artículo</Typography>
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <ArticleForm editedArticle={formData} onInputChange={handleChange} />
-          <Grid item xs={12}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              sx={{ marginRight: 2 }}
-            >
-              Crear Artículo
-            </Button>
-            <Button
-              component={Link}
-              to={"/articulos"}
-              variant="contained"
-              color="primary"
-            >
-              Volver
-            </Button>
+      <FormContainer elevation={4}>
+        <form onSubmit={handleSubmit}>
+          <Grid container spacing={2}>
+            <ArticleForm
+              editedArticle={formData}
+              onInputChange={handleChange}
+            />
+            <Grid item xs={12}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                sx={{ marginRight: 2 }}
+                disabled={isDisabled}
+              >
+                Crear Artículo
+              </Button>
+              <Button
+                component={Link}
+                to={"/articulos"}
+                variant="contained"
+                color="primary"
+              >
+                Volver
+              </Button>
+            </Grid>
           </Grid>
-        </Grid>
-      </form>
+        </form>
+      </FormContainer>
+
       <SnackbarNotification
         data={snackbarStatus}
         onClose={onSnackBarClose}
         onRetry={handleSubmit}
       />
-    </div>
+    </Container>
   );
 };
 

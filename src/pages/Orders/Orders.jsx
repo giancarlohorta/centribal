@@ -13,6 +13,7 @@ import parseFunctions from "../../utils/format";
 import ErrorMessage from "../../components/ErrorMessage";
 import SnackbarNotification from "../../components/SnackbarNotification";
 import useOrderManagement from "../../hooks/useOrderManagement";
+import { ButtonsContainer, Container, OrdersContainer } from "./OrdersStyles";
 
 const OrdersPage = () => {
   const {
@@ -39,20 +40,9 @@ const OrdersPage = () => {
   }
 
   return (
-    <div>
+    <Container>
       <Typography variant="h2">Lista de Pedidos</Typography>
-      <Button
-        component={Link}
-        to={"/nuevo-pedido"}
-        variant="contained"
-        color="primary"
-        sx={{ marginRight: 2 }}
-      >
-        Crear nuevo pedido
-      </Button>
-      <Button component={Link} to={"/"} variant="contained" color="primary">
-        Volver
-      </Button>
+
       {error && (
         <ErrorMessage
           message="Error en la búsqueda de pedidos. Por favor, inténtelo de nuevo."
@@ -60,7 +50,7 @@ const OrdersPage = () => {
         />
       )}
       {done && (
-        <>
+        <OrdersContainer elevation={4}>
           <Table>
             <TableHead>
               <TableRow>
@@ -107,9 +97,22 @@ const OrdersPage = () => {
             onClose={onSnackbarClose}
             onRetry={() => onDeleteOrder(snackbar.orderId)}
           />
-        </>
+        </OrdersContainer>
       )}
-    </div>
+      <ButtonsContainer>
+        <Button
+          component={Link}
+          to={"/nuevo-pedido"}
+          variant="contained"
+          color="primary"
+        >
+          Crear nuevo pedido
+        </Button>
+        <Button component={Link} to={"/"} variant="contained" color="primary">
+          Volver
+        </Button>
+      </ButtonsContainer>
+    </Container>
   );
 };
 

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Typography, Button, Grid } from "@mui/material";
+import { Typography, Button, Grid, Container } from "@mui/material";
 import ArticleForm from "../../components/ArticleForm";
 import parseFunctions from "../../utils/format";
 import ErrorMessage from "../../components/ErrorMessage";
 import SnackbarNotification from "../../components/SnackbarNotification";
 import useArticleManagement from "../../hooks/useArticleManagement";
+import { ArticleContainer, FormContainer } from "./ArticleDetailsStyles";
 
 const ArticleDetails = () => {
   const { id } = useParams();
@@ -24,6 +25,9 @@ const ArticleDetails = () => {
   const [originalArticle, setOriginalArticle] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
+
+  const articleChanged =
+    JSON.stringify(editedArticle) !== JSON.stringify(originalArticle);
 
   const handleEditArticle = () => {
     setIsEditing(true);
@@ -68,7 +72,7 @@ const ArticleDetails = () => {
   }
 
   return (
-    <div>
+    <Container>
       <Typography variant="h2">Detalhes do Artigo</Typography>
       {error && (
         <ErrorMessage
@@ -80,14 +84,17 @@ const ArticleDetails = () => {
         <Grid container spacing={2}>
           {isEditing ? (
             <>
-              <ArticleForm
-                editedArticle={editedArticle}
-                onInputChange={handleChange}
-              />
+              <FormContainer elevation={4}>
+                <ArticleForm
+                  editedArticle={editedArticle}
+                  onInputChange={handleChange}
+                />
+              </FormContainer>
               <Grid item xs={12}>
                 <Button
                   variant="contained"
                   onClick={handleSaveChanges}
+                  disabled={!articleChanged}
                   sx={{ marginRight: 2 }}
                 >
                   Salvar
@@ -99,27 +106,29 @@ const ArticleDetails = () => {
             </>
           ) : (
             <>
-              <Grid item xs={12}>
-                <Typography>Referencia: {article.ref}</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography>Nombre: {article.name}</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography>Descripción: {article.description}</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography>
-                  Precio sin impuestos:
-                  {parseFunctions.formatedCurrency(article.price)}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography>Impuesto aplicable: {article.tax}</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography>Cantidad: {article.quantity}</Typography>
-              </Grid>
+              <ArticleContainer elevation={4}>
+                <Grid item xs={12}>
+                  <Typography>Referencia: {article.ref}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography>Nombre: {article.name}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography>Descripción: {article.description}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography>
+                    Precio sin impuestos:
+                    {parseFunctions.formatedCurrency(article.price)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography>Impuesto aplicable: {article.tax}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography>Cantidad: {article.quantity}</Typography>
+                </Grid>
+              </ArticleContainer>
               <Grid item xs={12}>
                 <Button
                   variant="contained"
@@ -146,7 +155,7 @@ const ArticleDetails = () => {
           />
         </Grid>
       )}
-    </div>
+    </Container>
   );
 };
 
