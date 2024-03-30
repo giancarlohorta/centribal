@@ -1,8 +1,30 @@
-# React + Vite
+### `npm install`
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Use this command to install the dependencies.
 
-Currently, two official plugins are available:
+### `start-api`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Runs the server.\
+Open [http://localhost:3000/](http://localhost:3000/)
+
+### `npm run dev`
+
+Runs the app in the development mode.\
+Open [http://localhost:5173/](http://localhost:5173/) to view it in your browser.
+
+### `npm run test`
+
+run all tests and watch all changes.
+
+### `npm run test:coverage`
+
+after running the command the coverage page is on `/coverage/lcov-report/index.html`
+
+What have I used in this project?
+
+- Vite;
+- ReactJs;
+- React Router;
+- Material UI;
+- Jest with testing-library/react;
+- Axios and Axios-mock-adapter.
