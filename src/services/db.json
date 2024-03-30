@@ -7,7 +7,7 @@
       "description": "this is a test",
       "price": 30,
       "tax": 0.2,
-      "quantity": 0
+      "quantity": 9
     },
     {
       "id": "f698",
@@ -16,7 +16,7 @@
       "description": "this is a test",
       "price": 20,
       "tax": 0.21,
-      "quantity": 1
+      "quantity": 10
     },
     {
       "id": "a2dc",
@@ -25,24 +25,15 @@
       "description": "this is a test",
       "price": 30,
       "tax": 0.23,
-      "quantity": 1
+      "quantity": 28
     }
   ],
   "orders": [
     {
-      "id": "f884",
-      "total": 680,
-      "totalWithTax": 828.8,
+      "id": "93fd",
+      "total": 180,
+      "totalWithTax": 217.79999999999998,
       "items": [
-        {
-          "id": "c842",
-          "ref": "REF001",
-          "name": "Article test 1",
-          "description": "this is a test",
-          "price": 30,
-          "tax": 0.2,
-          "quantity": 4
-        },
         {
           "id": "f698",
           "ref": "REF002",
@@ -50,57 +41,14 @@
           "description": "this is a test",
           "price": 20,
           "tax": 0.21,
-          "quantity": 10
-        },
-        {
-          "id": "a2dc",
-          "ref": "REF003",
-          "name": "Article test 3",
-          "description": "this is a test",
-          "price": 30,
-          "tax": 0.23,
-          "quantity": 12
+          "quantity": 9
         }
       ]
     },
     {
-      "id": "eda4",
-      "total": 650,
-      "totalWithTax": 792.1999999999999,
-      "items": [
-        {
-          "id": "c842",
-          "ref": "REF001",
-          "name": "Article test 1",
-          "description": "this is a test",
-          "price": 30,
-          "tax": 0.2,
-          "quantity": 5
-        },
-        {
-          "id": "f698",
-          "ref": "REF002",
-          "name": "Article test 2",
-          "description": "this is a test",
-          "price": 20,
-          "tax": 0.21,
-          "quantity": 7
-        },
-        {
-          "id": "a2dc",
-          "ref": "REF003",
-          "name": "Article test 3",
-          "description": "this is a test",
-          "price": 30,
-          "tax": 0.23,
-          "quantity": 12
-        }
-      ]
-    },
-    {
-      "id": "f807",
-      "total": 220,
-      "totalWithTax": 268.9,
+      "id": "dbc8",
+      "total": 80,
+      "totalWithTax": 97.1,
       "items": [
         {
           "id": "c842",
@@ -118,7 +66,7 @@
           "description": "this is a test",
           "price": 20,
           "tax": 0.21,
-          "quantity": 2
+          "quantity": 1
         },
         {
           "id": "a2dc",
@@ -127,7 +75,7 @@
           "description": "this is a test",
           "price": 30,
           "tax": 0.23,
-          "quantity": 5
+          "quantity": 1
         }
       ]
     }

@@ -121,7 +121,7 @@ describe("OrderDetails", () => {
     expect(cancelButton).not.toBeInTheDocument();
     expect(ref).not.toBeInTheDocument();
   });
-  it("click edit button and remove from order", async () => {
+  it("click edit button and remove one article from order", async () => {
     mockGetAction(200);
     mockGetArticlesAction(200);
     render(<OrderDetailsMock />);
@@ -192,6 +192,49 @@ describe("OrderDetails", () => {
     expect(ref).toBeInTheDocument();
     fireEvent.click(addButton);
     expect(addButton).not.toBeInTheDocument();
+    const salveButton = screen.queryByRole("button", {
+      name: "Guardar Cambios",
+    });
+    expect(salveButton).toBeInTheDocument();
+    fireEvent.click(salveButton);
+    const successMessage = await screen.findByText(
+      "cambio guardado correctamente"
+    );
+    expect(successMessage).toBeInTheDocument();
+  });
+  it("click edit button and remove to order and save correctly", async () => {
+    mockGetAction(200);
+    mockGetArticlesAction(200);
+    mockPutOrderAction(200);
+    mockPutArticlesAction(200);
+    render(<OrderDetailsMock />);
+
+    const id = await screen.findByText(/37c4/i);
+
+    const title = screen.getByText("Detalles del Pedido");
+    const editButton = screen.getByRole("button", {
+      name: "Editar Pedido",
+    });
+
+    expect(title).toBeInTheDocument();
+    expect(id).toBeInTheDocument();
+    expect(editButton).toBeInTheDocument();
+    fireEvent.click(editButton);
+    const subTitle = screen.getByText("Agregar Nuevo Producto");
+    expect(subTitle).toBeInTheDocument();
+
+    const deleteButtons = screen.queryAllByRole("button", {
+      name: "Borrar",
+    });
+    expect(deleteButtons[0]).toBeInTheDocument();
+    expect(deleteButtons[1]).toBeInTheDocument();
+
+    const ref = screen.queryByText("REF001");
+    expect(ref).toBeInTheDocument();
+    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[1]);
+    expect(deleteButtons[0]).not.toBeInTheDocument();
+    expect(deleteButtons[1]).not.toBeInTheDocument();
     const salveButton = screen.queryByRole("button", {
       name: "Guardar Cambios",
     });
