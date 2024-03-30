@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import {
   Typography,
   Table,
@@ -11,89 +10,24 @@ import {
   Button,
 } from "@mui/material";
 import parseFunctions from "../../utils/format";
-import constants from "../../constants/constants";
 import ErrorMessage from "../../components/ErrorMessage";
 import SnackbarNotification from "../../components/SnackbarNotification";
-
-const { FETCH_STATUS, SNACKBAR_INITIAL } = constants;
+import useOrderManagement from "../../hooks/useOrderManagement";
 
 const OrdersPage = () => {
-  const [orders, setOrders] = useState([]);
-  const [fetchStatus, setFetchStatus] = useState(FETCH_STATUS.INITIAL);
-  const [snackbar, setSnackbar] = useState(SNACKBAR_INITIAL);
-
-  const error = fetchStatus === FETCH_STATUS.ERROR;
-  const loading = fetchStatus === FETCH_STATUS.LOADING;
-  const done = fetchStatus === FETCH_STATUS.DONE;
-
-  const fetchOrders = async () => {
-    setFetchStatus(FETCH_STATUS.LOADING);
-    try {
-      const response = await axios.get("http://localhost:3000/orders");
-      setOrders(response.data);
-      setFetchStatus(FETCH_STATUS.DONE);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      setFetchStatus(FETCH_STATUS.ERROR);
-    }
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbar(SNACKBAR_INITIAL);
-  };
+  const {
+    orders,
+    done,
+    loading,
+    error,
+    fetchOrders,
+    onDeleteOrder,
+    snackbar,
+    onSnackbarClose,
+  } = useOrderManagement();
 
   const handleRetry = () => {
-    setFetchStatus(FETCH_STATUS.INITIAL);
     fetchOrders();
-  };
-
-  const handleDeleteOrder = async (orderId) => {
-    try {
-      const orderDeteils = orders.find(({ id }) => id === orderId);
-      const orderItems = orderDeteils.items.map(({ id, quantity }) => {
-        return { id, quantity };
-      });
-      const articleResponses = await Promise.all(
-        orderItems.map(async (item) => {
-          const responseData = await axios.get(
-            `http://localhost:3000/articles/${item.id}`
-          );
-          return responseData.data;
-        })
-      );
-
-      const updatedArticles = articleResponses.map((article, index) => {
-        const updatedQuantity = article.quantity + orderItems[index].quantity;
-        return { ...article, quantity: updatedQuantity };
-      });
-
-      await Promise.all(
-        updatedArticles.map(async (article) => {
-          await axios.put(
-            `http://localhost:3000/articles/${article.id}`,
-            article
-          );
-        })
-      );
-
-      await axios.delete(`http://localhost:3000/orders/${orderId}`);
-      const updatedOrders = orders.filter((order) => order.id !== orderId);
-      setOrders(updatedOrders);
-      setSnackbar({
-        open: true,
-        orderId: "",
-        message: "borrado correctamente el pedido",
-        state: "success",
-      });
-    } catch (error) {
-      console.error("Error deleting order:", error);
-      setSnackbar({
-        open: true,
-        orderId,
-        message: "error al borrar el pedido, inténtelo de nuevo",
-        state: "error",
-      });
-    }
   };
 
   useEffect(() => {
@@ -159,7 +93,7 @@ const OrdersPage = () => {
                     <Button
                       variant="contained"
                       color="secondary"
-                      onClick={() => handleDeleteOrder(order.id)}
+                      onClick={() => onDeleteOrder(order.id)}
                     >
                       Borrar
                     </Button>
@@ -170,8 +104,8 @@ const OrdersPage = () => {
           </Table>
           <SnackbarNotification
             data={snackbar}
-            onClose={handleSnackbarClose}
-            onRetry={() => handleDeleteOrder(snackbar.orderId)}
+            onClose={onSnackbarClose}
+            onRetry={() => onDeleteOrder(snackbar.orderId)}
           />
         </>
       )}

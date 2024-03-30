@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Typography,
   Button,
@@ -11,79 +10,34 @@ import {
   TableHead,
   Table,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import OrderItem from "../../components/OrderItem";
 import OrderList from "../../components/OrderList";
 import parseFunctions from "../../utils/format";
-import constants from "../../constants/constants";
 import ErrorMessage from "../../components/ErrorMessage";
 import SnackbarNotification from "../../components/SnackbarNotification";
-
-const { FETCH_STATUS, SNACKBAR_INITIAL } = constants;
+import useOrderManagement from "../../hooks/useOrderManagement";
 
 const initialValue = {
   id: "",
 };
 
 const CreateOrderPage = () => {
-  const navigate = useNavigate();
-  const [articles, setArticles] = useState([]);
-  const [availableArticles, setAvailableArticles] = useState([]);
+  const {
+    order,
+    articles,
+    availableArticles,
+    loadingArticle,
+    doneArticle,
+    errorArticle,
+    snackbar,
+    onRemoveArticle,
+    onAddArticle,
+    onCreateOrder,
+    onSnackbarClose,
+    fetchArticles,
+  } = useOrderManagement();
   const [selectedArticle, setSelectedArticle] = useState(initialValue);
-  const [order, setOrder] = useState({
-    total: 0,
-    totalWithTax: 0,
-    items: [],
-  });
-  const [snackbar, setSnackbar] = useState(SNACKBAR_INITIAL);
-  const [fetchStatus, setFetchStatus] = useState(FETCH_STATUS.INITIAL);
-
-  const error = fetchStatus === FETCH_STATUS.ERROR;
-  const loading = fetchStatus === FETCH_STATUS.LOADING;
-  const done = fetchStatus === FETCH_STATUS.DONE;
-
-  const fetchArticles = async () => {
-    try {
-      setFetchStatus(FETCH_STATUS.LOADING);
-      const response = await axios.get("http://localhost:3000/articles");
-      setArticles(response.data);
-      setFetchStatus(FETCH_STATUS.DONE);
-    } catch (error) {
-      console.error("Error fetching articles:", error);
-      setFetchStatus(FETCH_STATUS.ERROR);
-    }
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbar(SNACKBAR_INITIAL);
-  };
-
-  const handleCreateOrder = async () => {
-    try {
-      await axios.post(`http://localhost:3000/orders`, order);
-
-      await Promise.all(
-        articles.map(async (item) => {
-          try {
-            await axios.put(`http://localhost:3000/articles/${item.id}`, {
-              ...item,
-              quantity: item.quantity,
-            });
-            navigate("/pedidos");
-          } catch (error) {
-            console.error("Error updating article:", error);
-          }
-        })
-      );
-    } catch (error) {
-      console.error("Error saving changes:", error);
-      setSnackbar({
-        open: true,
-        message: "error al crear el pedido, inténtelo de nuevo",
-        state: "error",
-      });
-    }
-  };
 
   const handleChangeSelectArticle = (event) => {
     const selectedItem = articles.find(
@@ -93,93 +47,16 @@ const CreateOrderPage = () => {
   };
 
   const handleAddArticle = (id, quantity) => {
-    const articleToAdd = availableArticles.find((article) => article.id === id);
-    const existingItemIndex = order.items.findIndex((item) => item.id === id);
-
-    if (existingItemIndex !== -1) {
-      return;
-    }
-    if (articleToAdd) {
-      const selectedItem = { ...articleToAdd, quantity };
-      const updatedOrder = {
-        ...order,
-        items: [...order.items, selectedItem],
-      };
-      const totalWithoutTax = updatedOrder.items.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0
-      );
-
-      const totalWithTax = updatedOrder.items.reduce(
-        (acc, item) => acc + item.price * (item.tax + 1) * item.quantity,
-        0
-      );
-      setOrder({
-        ...updatedOrder,
-        total: totalWithoutTax,
-        totalWithTax: totalWithTax,
-      });
-      const updatedArticles = articles.map((article) => {
-        if (article.id === articleToAdd.id) {
-          return {
-            ...article,
-            quantity: article.quantity - quantity,
-          };
-        }
-        return article;
-      });
-
-      setArticles(updatedArticles);
-      setSelectedArticle(initialValue);
-    }
+    onAddArticle(id, quantity);
+    setSelectedArticle(initialValue);
   };
 
-  const handleRemoveArticle = (id, quantity) => {
-    const existingItemIndex = order.items.findIndex((item) => item.id === id);
-
-    if (existingItemIndex === -1) {
-      return;
-    }
-
-    const updatedItems = [...order.items];
-    updatedItems.splice(existingItemIndex, 1);
-
-    const updatedOrder = {
-      ...order,
-      items: updatedItems,
-    };
-
-    const totalWithoutTax = updatedOrder.items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
-
-    const totalWithTax = updatedOrder.items.reduce(
-      (acc, item) => acc + item.price * (item.tax + 1) * item.quantity,
-      0
-    );
-
-    setOrder({
-      ...updatedOrder,
-      total: totalWithoutTax,
-      totalWithTax: totalWithTax,
-    });
-
-    const updatedArticles = articles.map((article) => {
-      if (article.id === id) {
-        return {
-          ...article,
-          quantity: article.quantity + quantity,
-        };
-      }
-      return article;
-    });
-
-    setArticles(updatedArticles);
+  const handleCreateOrder = () => {
+    onCreateOrder();
+    setSelectedArticle(initialValue);
   };
 
   const handleRetry = () => {
-    setFetchStatus(FETCH_STATUS.INITIAL);
     fetchArticles();
   };
 
@@ -187,29 +64,20 @@ const CreateOrderPage = () => {
     fetchArticles();
   }, []);
 
-  useEffect(() => {
-    if (order && articles.length > 0) {
-      const available = articles.filter((article) => {
-        return !order.items.some((item) => item.id === article.id);
-      });
-      setAvailableArticles(available);
-    }
-  }, [order, articles]);
-
-  if (loading) {
+  if (loadingArticle) {
     return <div>Carregando...</div>;
   }
 
   return (
     <div>
       <Typography variant="h2">Crear Nuevo Pedido</Typography>
-      {error && (
+      {errorArticle && (
         <ErrorMessage
           message="Error en la búsqueda de articulos. Por favor, inténtelo de nuevo."
           onRetray={handleRetry}
         />
       )}
-      {done && (
+      {doneArticle && (
         <>
           <div>
             <Typography variant="h6">Seleccione un Artículo:</Typography>
@@ -260,7 +128,7 @@ const CreateOrderPage = () => {
             Total con Impuestos:
             {parseFunctions.formatedCurrency(order.totalWithTax)}
           </Typography>
-          <OrderList list={order.items} edit onClick={handleRemoveArticle} />
+          <OrderList list={order.items} edit onClick={onRemoveArticle} />
           <Button
             variant="contained"
             color="primary"
@@ -274,7 +142,7 @@ const CreateOrderPage = () => {
           </Button>
           <SnackbarNotification
             data={snackbar}
-            onClose={handleSnackbarClose}
+            onClose={onSnackbarClose}
             onRetry={handleCreateOrder}
           />
         </>
